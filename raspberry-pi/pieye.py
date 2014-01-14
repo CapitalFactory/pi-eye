@@ -23,6 +23,7 @@ class PiEye():
     self.avgcol = None    # ongoing average of image channel
     self.avgdiff = None   # ongoing average of the image differences
 
+  # http://www.raspberrypi.org/phpBB3/viewtopic.php?t=56478&p=461637
   def diff(self, image):
     if self.prev_image is None:
       self.avgcol = image[:,:,1] # green channel
