@@ -18,3 +18,14 @@ Initial Team:
 
 The script uses boto, so the usual [boto config](http://code.google.com/p/boto/wiki/BotoConfig) locations (`~/.boto`, `/etc/boto.cfg`) are used.
 This also means that environment variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` with precedence as defined by boto.
+
+
+# Commands
+
+1. `pi-eye timelapse` (run from this package on the Raspberry Pi) will upload a picture to S3 with ID "pi2" every 15 seconds. Option examples:
+
+        --interval 60   # Upload every 60 seconds
+        --rotation 180  # Rotate the camera output by 180° before uploading
+        --id pi3        # Use id "pi3" (thus, upload to /images/pi3 instead)
+
+  Currently this is lazy and does not actually upload X seconds, but X seconds + how long it takes to capture and upload the image.
