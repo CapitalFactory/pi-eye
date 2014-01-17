@@ -12,6 +12,7 @@ import picamera
 
 import eye
 from eye import s3
+from eye import sqs
 
 
 def timelapse(parser):
@@ -47,6 +48,7 @@ def timelapse(parser):
             logger.info('Uploading %s', s3_path)
             bytestream.seek(0)
             s3.upload(bytestream, s3_path)
+            sqs.push('%s s3:%s' % (opts.id, s3_path))
 
             print >> sys.stderr, 'Sleeping %ds' % opts.interval
             time.sleep(opts.interval)
