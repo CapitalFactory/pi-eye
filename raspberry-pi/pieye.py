@@ -62,7 +62,7 @@ class PiEye():
         camera.resolution = (self.width, self.height)
         while True:
           self.frame += 1
-          camera.capture(stream, format='jpeg', use_video_port=True)
+          camera.capture(stream, format='jpeg', use_video_port=False)
           time.sleep(3)
           stream.seek(0)
           data = np.fromstring(stream.getvalue(), dtype=np.uint8)
