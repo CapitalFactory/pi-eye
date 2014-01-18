@@ -13,11 +13,10 @@ class PiEye():
     self.width = 288
     self.height = 192
     self.frame = 0
-    self.frac = 0.15       # fraction to update long-term average on each pass
-    self.avg_diff = None   # ongoing average of the image differences
+    self.frac = 0.15
+    self.avg_diff = None
     self.calibration_frames = 20
     self.diffs = []
-    self.std_diffs = []
     self.prev_diff = None
     self.threshold = .2
 
