@@ -17,7 +17,6 @@ class PiEye():
     self.avg_diff = None
     self.calibration_frames = 20
     self.diffs = []
-    self.prev_diff = None
     self.threshold = .2
 
   # http://www.raspberrypi.org/phpBB3/viewtopic.php?t=56478&p=461637
