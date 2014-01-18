@@ -1,10 +1,8 @@
 #!/usr/bin/python
 
-import io, os, time, datetime, cv2, sys
+from __future__ import division
+import io, os, time, datetime, cv2, sys, picamera
 import numpy as np
-
-sys.path.append('picamera')
-import picamera
 
 class PiEye():
   def __init__(self):
@@ -15,41 +13,48 @@ class PiEye():
     self.width = 288
     self.height = 192
     self.frame = 0
-    self.frac = 0.1       # fraction to update long-term average on each pass
-    self.a_thresh = 16.0  # amplitude change detection threshold for any pixel
-    self.pc_thresh = 20   # number of pixels required to exceed threshold
-    self.avgmax = 3       # long-term average of maximum-pixel-change-value
-    self.tfactor = 2      # threshold above max.average diff per frame for motion detect
-    self.avgcol = None    # ongoing average of image channel
-    self.avgdiff = None   # ongoing average of the image differences
+    self.frac = 0.15       # fraction to update long-term average on each pass
+    self.avg_diff = None   # ongoing average of the image differences
+    self.calibration_frames = 20
+    self.diffs = []
+    self.std_diffs = []
+    self.prev_diff = None
+    self.threshold = .2
 
   # http://www.raspberrypi.org/phpBB3/viewtopic.php?t=56478&p=461637
   def diff(self, image):
     if self.prev_image is None:
-      self.avgcol = image[:,:,1] # green channel
-      self.avgdiff = self.avgcol / 20.0 # obviously a coarse estimate
       self.prev_image = image
       return False
     else:
-      newcol = image[:,:,1] # green channel
-      self.avgcol = (self.avgcol * (1.0 - self.frac)) + (newcol * self.frac) # average green channel
+      matrix_diff = abs(self.prev_image - image)
+      avg_matrix_diff = np.average(matrix_diff)
+      self.diffs.append(avg_matrix_diff)
 
-      matrix_diff = abs(newcol - self.avgcol) # matrix of difference-from-average pixel values
-      self.avgdiff = ((1 - self.frac) * self.avgdiff) + (self.frac * matrix_diff)  # long-term average difference
+      if self.frame <= self.calibration_frames:
+        if self.avg_diff is None:
+          self.avg_diff = avg_matrix_diff
+        else:
+          self.avg_diff = (self.avg_diff * (1 - self.frac)) + (avg_matrix_diff * self.frac)
 
-      self.a_thresh = self.tfactor * self.avgmax # adaptive amplitude-of-change threshold
-      changed = np.extract(matrix_diff > self.a_thresh, matrix_diff) # extract pixels that have changed past threshold
-      count_change = changed.size # get number of changed pixels
+      has_motion = avg_matrix_diff > (self.avg_diff * (1 + self.threshold))
 
-      max = np.amax(matrix_diff) # find the biggest (single-pixel) change
-      self.avgmax = ((1 - self.frac) * self.avgmax) + (max * self.frac)
+      if self.debug:
+        print "frame: %s, avg_diff: %.05f, this diff: %.05f, motion: %s" % (self.frame, self.avg_diff, avg_matrix_diff, has_motion)
+      
+      self.prev_image = image
 
-      print "a_thresh: %s, avg matrix_diff: %s, different pixels: %s" % (self.a_thresh, np.average(matrix_diff), count_change)
-      return count_change > self.pc_thresh # notable change of enough pixels => motion!
+      if self.frame <= self.calibration_frames:
+        print "calibrating..."
+        return False
+      else:
+        if self.frame == self.calibration_frames + 1:
+          print "done calibrating. avg_diff set at %.06f" % (self.avg_diff)
+        return has_motion
 
-  def push_image(self, image):
+  def push_image(self, image, motion):
     if self.debug:
-      path = "%s/%s.jpg" % (self.image_directory, self.frame)
+      path = "%s/%s-%s.jpg" % (self.image_directory, self.frame, motion)
       cv2.imwrite(path, image)
     else:
       # push to S3 here, send SQS
@@ -60,26 +65,36 @@ class PiEye():
     stream = io.BytesIO()
     with picamera.PiCamera() as camera:
         camera.resolution = (self.width, self.height)
+        camera.raw_format = 'rgb'
+        time.sleep(3) # let camera adjust
         while True:
           self.frame += 1
-          camera.capture(stream, format='jpeg', use_video_port=False)
-          time.sleep(3)
+          camera.capture(stream, 'raw')
           stream.seek(0)
-          data = np.fromstring(stream.getvalue(), dtype=np.uint8)
-          image = cv2.imdecode(data, 1)
-          image = image.astype(np.float32)
-          self.push_image(image)
-          
-          if self.diff(image):
-            self.last_report = datetime.datetime.now()
 
-          if self.frame > 10:
+          fwidth = (self.width + 31) // 32 * 32
+          fheight = (self.height + 15) // 16 * 16
+
+          image = np.fromstring(stream.getvalue(), dtype=np.uint8).\
+                reshape((fheight, fwidth, 3))[:self.height, :self.width, :]
+
+          image_float = image.astype(np.float) / 255.0
+          
+          if self.diff(image_float):
+            self.push_image(image, motion=True)
+            self.last_report = datetime.datetime.now()
+          else:
+            self.push_image(image, motion=False)
+
+          if self.frame == 40:
             sys.exit()
 
           # an hour has passed
-          if self.last_report is None or (datetime.datetime.now() - datetime.timedelta(minutes=60)) > self.last_report:
-            self.push_image(image)
-            self.last_report = datetime.datetime.now()
+          #if self.last_report is None or (datetime.datetime.now() - datetime.timedelta(minutes=60)) > self.last_report:
+            #self.push_image(image, motion=False)
+            #self.last_report = datetime.datetime.now()
+
+          time.sleep(.2)
 
 if __name__ == "__main__":
   eye = PiEye()
