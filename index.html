@@ -1,38 +1,9 @@
-<!DOCTYPE html>
-<html>
-
-  <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Pi-Eye : Raspberry PI camera-based instrumentation" />
-
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Pi-Eye</title>
-  </head>
-
-  <body>
-
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/CapitalFactory/pi-eye">View on GitHub</a>
-
-          <h1 id="project_title">Pi-Eye</h1>
-          <h2 id="project_tagline">Raspberry PI camera-based instrumentation</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/CapitalFactory/pi-eye/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/CapitalFactory/pi-eye/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h3>
-<a name="whats-going-on-in-the-100-feet-around-you" class="anchor" href="#whats-going-on-in-the-100-feet-around-you"><span class="octicon octicon-link"></span></a>What's going on in the 100 feet around you?</h3>
+---
+published: true
+layout: default
+---
+<h3>
+  <a name="whats-going-on-in-the-100-feet-around-you" class="anchor" href="#whats-going-on-in-the-100-feet-around-you"></a>What's going on in the 100 feet around you?</h3>
 
 <p>Wouldn't it be nice if you could find out about your local environment from your phone like you use Google Maps to navigate?  We think so.</p>
 
@@ -46,7 +17,7 @@
 </code></pre>
 
 <h3>
-<a name="design-considerations" class="anchor" href="#design-considerations"><span class="octicon octicon-link"></span></a>Design Considerations</h3>
+  <a name="design-considerations" class="anchor" href="#design-considerations"></a>Design Considerations</h3>
 
 <p>We could have served this application entirely from the PI but using the cloud simplifies the design and allows us to do things that are too compute-intensive for the ARM cpu.  By pushing data to the cloud, we don't have to worry about security and firewall issues.</p>
 
@@ -55,30 +26,29 @@
 <p>Once we have some real world data, we'll sort out how to minimize state transitions and resource consumption.</p>
 
 <h3>
-<a name="social-considerations" class="anchor" href="#social-considerations"><span class="octicon octicon-link"></span></a>Social Considerations</h3>
+  <a name="social-considerations" class="anchor" href="#social-considerations"></a>Social Considerations</h3>
 
 <p>Will people let us point cameras at them all the time?  Will we creep people out?  We don't know.</p>
 
 <p>Part of the decision to provide an open source / transparent implementation is to show that the system isn't really suitable for spying on people.</p>
 
 <h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+  <a name="social-considerations" class="anchor" href="#social-considerations"></a>Posts</h3>
+
+<p>Throughout development, we will periodically post about our ideas, goals, problems, and progress.</p>
+<p>Watch this section for upcoming blog posts!</p>
+
+<ul>
+{% for post in site.posts %}
+  <li class="post-title">
+    <a href="{{ site.base_url }}{{ post.url }}">{{ post.title }}</a>
+  </li>
+{% endfor %}
+</ul>
+
+<h3>
+<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"></a>Authors and Contributors</h3>
 
 <p>This project is put together and sponsored by <a href="https://github.com/joshuaellinger" class="user-mention">@joshuaellinger</a> from Exemplar Technologies.</p>
 
 <p>Chris Brown and Connor Smith are doing most/all of the coding.</p>
-      </section>
-    </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Pi-Eye maintained by <a href="https://github.com/CapitalFactory">CapitalFactory</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
-    
-
-  </body>
-</html>
