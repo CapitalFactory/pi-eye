@@ -41,7 +41,7 @@ layout: default
 <ul>
 {% for post in site.posts %}
   <li class="post-title">
-    <a href="{{ site.base_url }}{{ post.url }}">{{ post.title }}</a>
+    <a href="{{site.root}}{{ post.url }}">{{ post.title }}</a>
   </li>
 {% endfor %}
 </ul>
