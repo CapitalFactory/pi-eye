@@ -48,7 +48,7 @@ def timelapse(parser):
             logger.info('Uploading %s', s3_path)
             bytestream.seek(0)
             s3.upload(bytestream, s3_path)
-            sqs.push('%s s3:%s' % (opts.id, s3_path))
+            sqs.push(dict(id=opts.id, s3=s3_path))
 
             print >> sys.stderr, 'Sleeping %ds' % opts.interval
             time.sleep(opts.interval)
@@ -64,9 +64,31 @@ def app(parser):
     bottle.run(app, port=8091, reloader=opts.reload)
 
 
+def listen(parser):
+    '''
+    `pi-eye listen` should be run in conjunction with `pi-eye app`,
+    '''
+    import redis
+    # pi:latest-images is an intermediate cache of the latest images
+    # sent home from the various pis
+    redis_client = redis.StrictRedis()
+    redis_key = 'pi:latest-image-urls'
+    latest_image_urls = redis_client.hgetall(redis_key)
+    logger.info('Listening (current value: %r)', latest_image_urls)
+
+    from eye import sqs, s3
+    for message in sqs.pop_loop():
+        # each message in the queue should be a dict with id and s3 bucket key
+        url = s3.get_url(message['s3'])
+        logger.info('Setting: %s[%s] = %r', redis_key, message['id'], url)
+        redis_client.hset(redis_key, message['id'], url)
+    # this loop should never exit
+    logger.critical('Stopping listening')
+
+
 def main():
     import argparse
-    commands = dict(timelapse=timelapse, app=app)
+    commands = dict(timelapse=timelapse, app=app, listen=listen)
     parser = argparse.ArgumentParser(description='Primary entry point for common pi-eye commands',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('command', choices=commands, help='Command to run')

@@ -23,5 +23,7 @@ def root():
 @app.get('/dashboard')
 @view('dashboard.mako')
 def index():
-    # the worker should have populated the redis store
-    return dict()
+    # the worker (pi-eye listener) should have populated the redis store
+    image_urls = redis_client.hgetall('pi:latest-image-urls')
+
+    return dict(image_urls=image_urls)

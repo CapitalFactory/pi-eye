@@ -3,3 +3,10 @@
 <h1>Dashboard</h1>
 
 <p>This page displays the latest status reported back from each Pi.</p>
+
+%for name, url in image_urls.items():
+  <div>
+    <h3>${name}</h3>
+    <img src="${url}" />
+  </div>
+%endfor
