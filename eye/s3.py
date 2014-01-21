@@ -30,6 +30,7 @@ def upload(fp, key, bucket='eye-pi'):
     sys.stderr.write('\n')
     sys.stderr.flush()
 
+
 def get_url(key, expires_in=3600, bucket='eye-pi'):
     # default expires: one hour = 60s*60m = 3600s
     s3 = S3Connection()
