@@ -54,9 +54,19 @@ def timelapse(parser):
             time.sleep(opts.interval)
 
 
+def app(parser):
+    parser.add_argument('--reload', action='store_true', help='Reload bottle app automatically')
+    opts = parser.parse_args()
+
+    import bottle
+    from eye.www import app
+
+    bottle.run(app, port=8091, reloader=opts.reload)
+
+
 def main():
     import argparse
-    commands = dict(timelapse=timelapse)
+    commands = dict(timelapse=timelapse, app=app)
     parser = argparse.ArgumentParser(description='Primary entry point for common pi-eye commands',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('command', choices=commands, help='Command to run')

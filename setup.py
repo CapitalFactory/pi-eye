@@ -26,6 +26,9 @@ setup(
         # 'cv2', # aptitude install is not currently recognized
         'picamera',
         'boto',
+        'bottle',
+        'mako',
+        'redis',
     ],
     packages=find_packages(),
     entry_points={

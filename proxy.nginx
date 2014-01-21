@@ -1,0 +1,14 @@
+server {
+    server_name 54.213.11.168 localhost _;
+    gzip on;
+
+    location /static {
+        root /www/pi-eye/static;
+    }
+    location /templates {
+        root /www/pi-eye/templates;
+    }
+    location / {
+        proxy_pass http://127.0.0.1:8091;
+    }
+}

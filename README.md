@@ -29,3 +29,7 @@ This also means that environment variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_A
         --id pi3        # Use id "pi3" (thus, upload to /images/pi3 instead)
 
   Currently this is lazy and does not actually upload X seconds, but X seconds + how long it takes to capture and upload the image.
+
+2. `pi-eye app`
+
+    Assuming that you cloned this repo like into `/www/pi-eye`, and installed nginx, you should link in the config file so that you don't have to run the Bottle app as root, but still listen on :80, by having nginx back-proxy requests to the Bottle app listening on :8091 (the default). Run this: `ln -sf /www/pi-eye/proxy.nginx /etc/nginx/sites-enabled/pi-eye`
