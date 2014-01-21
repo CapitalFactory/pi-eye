@@ -7,6 +7,7 @@ def pop_loop(queue='pi-status', wait=5):
     # like pop(), but iterate
     sqs = SQSConnection()
     sqs_queue = sqs.create_queue(queue)
+    sqs_queue.set_message_class(JSONMessage)
 
     while True:
         message = sqs_queue.read(wait_time_seconds=wait)
@@ -16,7 +17,7 @@ def pop_loop(queue='pi-status', wait=5):
             yield body
 
 
-def pop(queue='pi-status', ):
+def pop(queue='pi-status'):
     '''
     Pop the next Message off the queue, immediately delete it
     (mark it as consumed), and return the body string.
@@ -25,6 +26,7 @@ def pop(queue='pi-status', ):
     '''
     sqs = SQSConnection()
     sqs_queue = sqs.create_queue(queue)
+    sqs_queue.set_message_class(JSONMessage)
 
     message = sqs_queue.read()
     if message is not None:

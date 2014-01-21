@@ -10,3 +10,10 @@
     <img src="${url}" />
   </div>
 %endfor
+
+<script>
+// refresh every 10s
+setTimeout(function() {
+  window.location = window.location;
+}, 10000);
+</script>
