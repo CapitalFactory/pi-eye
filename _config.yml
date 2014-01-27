@@ -1,2 +1,2 @@
 root: '/pi-eye'
-# root: '' # <-- for local development
+# root: '' # <-- uncomment this line for local development
